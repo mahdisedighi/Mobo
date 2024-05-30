@@ -1,2 +1,2 @@
-git pull https://github.com/mahdisedighi/MoboToBiid.git
+git pull https://github.com/mahdisedighi/Mobo.git
 pause
