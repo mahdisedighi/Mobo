@@ -1,9 +1,14 @@
 import json
 import logging
+import re
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-import requests
 from requests import HTTPError
+
+import requests
+from bs4 import BeautifulSoup
+from time import sleep
 
 from utils.config import configs
 from utils.request import BaseRequests
@@ -290,4 +295,64 @@ class Biid(BaseRequests):
         )
 
         return response
+
+
+class Mobo():
+
+    BASE_URL = 'https://mobomobo.ir/'
+    def get_response(self, url):
+        response = requests.get(url)
+        return response
+
+    def get_soup(self , response):
+        soup = BeautifulSoup(response.text ,"html.parser")
+        return soup
+
+    def get_products(self , page=1):
+        categories = [
+            "case",
+            "airpods",
+            "applewatch",
+            "accessories-2",
+            "accessories",
+        ]
+        counter = 0
+        for category in categories:
+            temp = True
+            url = f"{self.BASE_URL}products/{category}?page={page}"
+            response = self.get_response(url)
+            soup1 = self.get_soup(response)
+            while temp:
+                url = f"{self.BASE_URL}products/{category}?page={page}"
+                response = self.get_response(url)
+                soup = self.get_soup(response)
+                if soup1==soup and page!=1:
+                    temp = False
+                    page = 1
+                else:
+                    elements = soup.find_all(attrs={'class': "store-product"})
+                    for element in elements:
+                        link = element.find("a").get("href").replace("/", "")
+                        counter = counter +1
+                        yield link
+                    page += 1
+
+    def get_title(self,product_id):
+        url = f'{self.BASE_URL}{product_id}'
+        response = self.get_response(url)
+        soup = self.get_soup(response)
+        title = soup.find(attrs={'class': "product-title"}).text.replace("\t","").replace("\n","")
+        title = re.sub(r'\([^)]*\)','',title)
+        if title[-1] == " ":
+            title = title[:-1]
+        return title
+
+    def get_info(self,product_id):
+        pass
+
+
+
+
+
+
 
