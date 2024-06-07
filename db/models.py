@@ -1,6 +1,13 @@
 from django.db import models
 from django.utils import timezone
 
+class Brand(models.Model):
+    brand = models.CharField(max_length=125, blank=True, null=True)
+
+class Product_model(models.Model):
+    model = models.CharField(max_length=125, blank=True ,null=True)
+    brand = models.ForeignKey(Brand ,on_delete=models.CASCADE ,blank=True ,null=True)
+
 class Product(models.Model):
     id = models.IntegerField(primary_key=True)
     identifier = models.CharField(max_length=128 , null=True, blank=True, unique=True)

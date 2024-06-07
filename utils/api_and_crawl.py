@@ -12,7 +12,7 @@ from time import sleep
 
 from utils.config import configs
 from utils.request import BaseRequests
-
+from db.models import Product_model
 
 class Biid(BaseRequests):
     TOKEN = configs.get('biid_token')
@@ -332,9 +332,13 @@ class Mobo():
                 else:
                     elements = soup.find_all(attrs={'class': "store-product"})
                     for element in elements:
+                        attrs_element = element.attrs["class"]
                         link = element.find("a").get("href").replace("/", "")
-                        counter = counter +1
-                        yield link
+                        if 'store-full-product-outofstock' in attrs_element:
+                            continue
+                        else:
+                            counter +=1
+                            yield link
                     page += 1
 
     def get_title(self,product_id):
@@ -348,7 +352,105 @@ class Mobo():
         return title
 
     def get_info(self,product_id):
-        pass
+        url = f'{self.BASE_URL}{product_id}'
+        response = self.get_response(url)
+        soup = self.get_soup(response)
+        title = self.get_title(product_id)
+        product_models = Product_model.objects.all()
+        product_groups = {}
+        all_products = []
+        num = [f"-{i}" for i in range(0,30)]
+        if "قاب" in title:
+            elements = soup.find_all(attrs={'class':'product-variant-input'})[0].find_all("option")
+            for i in elements:
+                data_stock = i.get("data-stock")
+                if data_stock != "0":
+                    text = i.text.replace("\t","").replace("\n","")
+                    split_text = text.split("،")
+                    for item in split_text:
+                        if "\u200f" in item:
+                            index = split_text.index(item)
+                            split_text[index] = item.replace("\u200f", "")
+
+                    for it in split_text:
+                        for n in num:
+                            n = n[::-1]
+                            if n in it:
+                                index = split_text.index(it)
+                                split_text[index] = it.replace(n,"")
+
+                    price = i.get("data-price")
+                    for n in num:
+                        if n in price:
+                            price = price.replace(n , "")
+                        if " " in price:
+                            price = price.raplace(" ", "")
+                    # sleep(50)
+
+                    # [model , design , color , price]
+                    new_list = ["","","" , f"{price}"]
+                    for item in split_text:
+                        if "مدل:" in item:
+                            new_list[0] =item.replace("مدل: ", "")
+                            if new_list[0][0] == " ":
+                                new_list[0] = new_list[0][1:]
+                        elif "Phone Model:" in item:
+                            new_list[0] =item.replace("Phone Model: ", "")
+                        elif "مدل موبایل:" in item:
+                            new_list[0] =item.replace("مدل موبایل: ", "")
+                        elif "مدل گوشی:" in item:
+                            new_list[0] =item.replace("مدل گوشی: ", "")
+                        elif "Apple:" in item:
+                            new_list[0] =item.replace("Apple: ")
+                        elif "iPhone:" in item:
+                            new_list[0] =item.replace("iPhone: ", "")
+
+                        if "طرح:" in item:
+                            new_list[1] =item.replace("طرح: ", "")
+                        elif "شاسی:" in item:
+                            new_list[1] =item.replace("شاسی: ", "")
+                        elif "بازیکن:" in item:
+                            new_list[1] =item.replace("بازیکن: " ,"")
+
+                        if "رنگ:" in item:
+                            new_list[2] =item.replace("رنگ: ","")
+
+
+                    all_products.append(new_list)
+            for product in all_products:
+                product_name = product[0]
+                if product_name in product_groups:
+                    product_groups[product_name]["design"].append(product[1])
+                    product_groups[product_name]["color"].append(product[2])
+                else:
+                    product_groups[product_name] = {
+                        "product_id": f"{product_id}",
+                        "title": f"{self.get_title(product_id)}",
+                        "design": [product[1]],  # لیست خالی برای طرح ها
+                        "color": [product[2]],
+                        "price": product[3],
+                        "category": "قاب"
+                    }
+
+
+            return product_groups
+
+
+        elif "کاور" in title:
+            # elements = soup.find_all(attrs={'class':'product-variant-input'})[0].find_all("option")
+            # print(product_id)
+            # for i in elements:
+            #     data_stock = i.get("data-stock")
+            #     if data_stock != "0":
+            #         print(i.text.replace("\t","").replace("\n",""))
+            # print("\n\n")
+            # sleep(5)
+        elif "محافظ کابل" in title:
+            pass
+        elif "جاکارتی" in title:
+            pass
+
+
 
 
 

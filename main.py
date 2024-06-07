@@ -13,7 +13,7 @@ import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'MoboToBiid.settings')
 import django
 django.setup()
-
+from time import sleep
 # Import your models for use in your script
 from db.models import *
 
@@ -22,6 +22,13 @@ from db.models import *
 ############################################################################
 """ Replace the code below with your own """
 from utils.api_and_crawl import Mobo
+from db.models import Brand , Product_model
+
+
+
 if __name__ == '__main__':
     m = Mobo()
-    m = m.get_title("0043")
+    p = m.get_products()
+    for i in p:
+        m.get_info(i)
+
