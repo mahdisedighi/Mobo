@@ -12,7 +12,7 @@ from time import sleep
 
 from utils.config import configs
 from utils.request import BaseRequests
-from db.models import Product_model
+from db.models import Product_model , Product_model
 
 class Biid(BaseRequests):
     TOKEN = configs.get('biid_token')
@@ -168,40 +168,26 @@ class Biid(BaseRequests):
         response = requests.post(url, headers=self.headers, json=tag, cookies=self.session.cookies)
         return response
 
-    def add_product(self, product, categories, brand):
+    def add_product(self, product, category):
         url = f"{self.BASE_URL}/products/"
         cat_id = 0
         res = False
-        parent = 2
-        for category in categories:
-            for cat in self.get_categories()['result']:
-                if cat['name'] == category:
-                    parent = int(cat['id'])
-                    res = True
-            if res == False:
-                cat_j = {
-                    "name": f"{category}",
-                    'parent': parent,
-                }
-                x = self.add_category(cat_j)
-                parent = int(x.json()['id'])
-            res = False
+        parent = 435
+        for cat in self.get_categories()['result']:
+            if cat['name'] == category and cat["parent"] ==parent:
+                parent = int(cat['id'])
+                res = True
+        if res == False:
+            cat_j = {
+                "name": f"{category}",
+                'parent': parent,
+            }
+            x = self.add_category(cat_j)
+            parent = int(x.json()['id'])
 
         product['main_category'] = parent
 
-        res = False
-        for bra in self.get_brands()['result']:
-            if bra['name'] == brand:
-                bra_id = int(bra['id'])
-                res = True
-        if res == False:
-            bra_j = {
-                "name": f"{brand}"
-            }
-            x = self.add_brand(bra_j)
-            bra_id = int(x.json()['id'])
 
-        product['brand'] = bra_id
 
         response = requests.post(
             url,
@@ -338,6 +324,7 @@ class Mobo():
                             continue
                         else:
                             counter +=1
+                            sleep(5)
                             yield link
                     page += 1
 
@@ -359,7 +346,7 @@ class Mobo():
         product_models = Product_model.objects.all()
         product_groups = {}
         all_products = []
-        num = [f"-{i}" for i in range(0,30)]
+        num = [f"-{i}" for i in range(0,50)]
         if "قاب" in title:
             elements = soup.find_all(attrs={'class':'product-variant-input'})[0].find_all("option")
             for i in elements:
@@ -385,10 +372,25 @@ class Mobo():
                             price = price.replace(n , "")
                         if " " in price:
                             price = price.raplace(" ", "")
-                    # sleep(50)
 
-                    # [model , design , color , price]
-                    new_list = ["","","" , f"{price}"]
+                    if "آیفون سامسونگ شیائومی" in title:
+                        title =title.replace("آیفون سامسونگ شیائومی" ,"")
+                    elif "آیفون / سامسونگ / شیائومی" in title:
+                        title =title.replace("آیفون / سامسونگ / شیائومی" ,"")
+                    elif "آیفون ، سامسونگ ، شیائومی" in title:
+                        title =title.replace("آیفون ، سامسونگ ، شیائومی" ,"")
+                    elif "سامسونگ و شیائومی" in title:
+                        title =title.replace("سامسونگ و شیائومی" ,"")
+                    elif "آیفونی" in title:
+                        title =title.replace("آیفون" ,"")
+                    elif "آیفون" in title:
+                        title =title.replace("آیفون" ,"")
+
+
+
+
+                    #[model , design , color , price]
+                    new_list = ["","","" , f"{price}" , f'{data_stock}']
                     for item in split_text:
                         if "مدل:" in item:
                             new_list[0] =item.replace("مدل: ", "")
@@ -418,43 +420,597 @@ class Mobo():
 
                     all_products.append(new_list)
             for product in all_products:
-                product_name = product[0]
+
+                temp = title
+                for xxx in product_models:
+                    name = xxx.model.lower()
+                    try:
+                        jj =product[0].replace(" ","")
+                    except:
+                        pass
+                    jj = jj.lower()
+                    if "iphone" in jj:
+                        brand_id = 4
+                        break
+                    elif (jj in name) or (name in jj):
+                        brand_id =xxx.brand_id
+                        brand_name = Product_model.objects.get(id=brand_id)
+                        brand_id = brand_name.id
+                        break
+
+                if str(brand_id) == "1":
+                    brand_name = "سامسونگ "
+                    status_title = "yes"
+                elif str(brand_id) == "2" or str(brand_id) == "3":
+                    brand_name = "شیائومی "
+                    status_title = "yes"
+                elif str(brand_id) == "4":
+                    brand_name = "آیفون "
+                    status_title = "yes"
+                else:
+                    brand_name =""
+                    status_title = "no"
+
+                title = f"{title} مناسب برای {brand_name +product[0]}"
+                product_name = title
+                title =temp
                 if product_name in product_groups:
-                    product_groups[product_name]["design"].append(product[1])
-                    product_groups[product_name]["color"].append(product[2])
+                    if product[1] not in product_groups[product_name]["design"]:
+                        product_groups[product_name]["design"].append(product[1])
+                    if product[2] not in product_groups[product_name]["color"]:
+                        product_groups[product_name]["color"].append(product[2])
                 else:
                     product_groups[product_name] = {
                         "product_id": f"{product_id}",
-                        "title": f"{self.get_title(product_id)}",
+                        "title": f"{product_name}",
                         "design": [product[1]],  # لیست خالی برای طرح ها
                         "color": [product[2]],
                         "price": product[3],
-                        "category": "قاب"
+                        "stock": 1 if product[4] != "0" else 0,
+                        "status_title" : status_title,
+
                     }
+                    product_groups["category"] ="قاب"
+                    product_groups["product_id"] =f"{product_id}"
+
+
+            return product_groups
+
+        elif "کاور ایرپاد" in title:
+            elements = soup.find_all(attrs={'class':'product-variant-input'})[0].find_all("option")
+            for i in elements:
+                data_stock = i.get("data-stock")
+                if data_stock != "0":
+                    text =i.text.replace("\t","").replace("\n","")
+                    split_text =text.split("،")
+
+                    for it in split_text:
+                        for n in num:
+                            n = n[::-1]
+                            if n in it:
+                                index = split_text.index(it)
+                                split_text[index] = it.replace(n,"")
+
+                    price = i.get("data-price")
+                    for n in num:
+                        if n in price:
+                            price = price.replace(n , "")
+                        if " " in price:
+                            price = price.raplace(" ", "")
+
+
+                    # [model , design , color , price]
+                    new_list = ["","","" , f"{price}" , f'{data_stock}']
+
+                    for item in split_text:
+                        if "مدل:" in item:
+                            new_list[0] =item.replace("مدل: ","")
+                            if new_list[0][0] == " ":
+                                new_list[0] = new_list[0][1:]
+
+
+                        if "رنگ:" in item:
+                            new_list[2] =item.replace("رنگ: " ,"")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+
+                        elif "طرح:" in item:
+                            new_list[2] =item.replace("طرح: " ,"")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+
+                        all_products.append(new_list)
+
+
+            for product in all_products:
+                temp =title
+                title = f"{title} مناسب برای {product[0]}"
+                product_name =title
+                title =temp
+                if product_name in product_groups:
+                    if product[1] not in product_groups[product_name]["design"]:
+                        product_groups[product_name]["design"].append(product[1])
+                    if product[2] not in product_groups[product_name]["color"]:
+                        product_groups[product_name]["color"].append(product[2])
+                else:
+                    product_groups[product_name] = {
+                        "product_id": f"{product_id}",
+                        "title": f"{product_name}",
+                        "design": [product[1]],  # لیست خالی برای طرح ها
+                        "color": [product[2]],
+                        "price": product[3],
+                        "stock": "1" if product[4] != "0" else "0",
+
+                    }
+                    product_groups["category"] = "کاور ایرپاد"
+                    product_groups["product_id"] =f"{product_id}"
+
+
+            return product_groups
+
+        elif "محافظ کابل" in title:
+            elements = soup.find_all(attrs={'class': 'product-variant-input'})[0].find_all("option")
+            for i in elements:
+                data_stock = i.get("data-stock")
+                if data_stock != "0":
+                    text =i.text.replace("\t","").replace("\n","")
+                    split_text =text.split("،")
+
+                    for it in split_text:
+                        for n in num:
+                            n = n[::-1]
+                            if n in it:
+                                index = split_text.index(n)
+                                split_text[index] = it.replace(n, "")
+
+                    price = i.get("data-price")
+                    for n in num:
+                        if n in price:
+                            price = price.replace(n, "")
+                        if " " in price:
+                            price = price.raplace(" ", "")
+
+
+                    # [model , design , color , price]
+                    new_list = ["","","" , f"{price}" , f'{data_stock}']
+
+                    for item in split_text:
+
+                        if "مدل:" in item:
+                            new_list[0] = item.replace("مدل: " ,"")
+                            if new_list[0][0] ==" ":
+                                new_list[0] = new_list[0][1:]
+
+                        if "رنگ:" in item:
+                            new_list[2] =item.replace("رنگ: " ,"")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+
+                        all_products.append(new_list)
+
+            for product in all_products:
+                product_name = title
+                if product_name in product_groups:
+                    if product[1] not in product_groups[product_name]["design"]:
+                        product_groups[product_name]["design"].append(product[1])
+                    if product[2] not in product_groups[product_name]["color"]:
+                        product_groups[product_name]["color"].append(product[2])
+                else:
+                    product_groups[product_name] = {
+                        "product_id": f"{product_id}",
+                        "title": title,
+                        "design": [product[1]],  # لیست خالی برای طرح ها
+                        "color": [product[2]],
+                        "price": product[3],
+                        "stock" : "1" if product[4] != "0" else "0",
+                    }
+                    product_groups["category"] = "محافظ کابل"
+                    product_groups["product_id"] =f"{product_id}"
+
+
+            return product_groups
+
+        elif "جاکارتی" in title:
+            elements = soup.find_all(attrs={'class': 'product-variant-input'})[0].find_all("option")
+            for i in elements:
+                data_stock = i.get("data-stock")
+                if data_stock != "0":
+                    text = i.text.replace("\t", "").replace("\n", "")
+                    split_text = text.split("،")
+                    price = i.get("data-price")
+                    for n in num:
+                        if n in price:
+                            price = price.replace(n, "")
+                        if " " in price:
+                            price = price.raplace(" ", "")
+
+                    # [model , design , color/model , price]
+                    new_list = ["","","" , f"{price}" , f'{data_stock}']
+
+                    for item in split_text:
+
+                        if "مدل:" in item:
+                            new_list[2] = item.replace("مدل: ", "")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+
+            for product in all_products:
+                product_name = title
+                if product_name in product_groups:
+                    if product[1] not in product_groups[product_name]["design"]:
+                        product_groups[product_name]["design"].append(product[1])
+                    if product[2] not in product_groups[product_name]["color"]:
+                        product_groups[product_name]["color"].append(product[2])
+                else:
+                    product_groups[product_name] = {
+                        "product_id": f"{product_id}",
+                        "title": title,
+                        "design": [product[1]],  # لیست خالی برای طرح ها
+                        "color": [product[2]],
+                        "price": product[3],
+                        "stock": "1" if product[0] != "0" else "0",
+
+                    }
+                    product_groups["category"] = "جاکارتی"
+                    product_groups["product_id"] =f"{product_id}"
+
+
+            return product_groups
+
+        elif "اپل واچ" in title:
+            elements = soup.find_all(attrs={'class': 'product-variant-input'})[0].find_all("option")
+            for i in elements:
+                data_stock = i.get("data-stock")
+                if data_stock != "0":
+                    text = i.text.replace("\t", "").replace("\n", "")
+                    split_text = text.split("،")
+                    price = i.get("data-price")
+                    for n in num:
+                        if n in price:
+                            price = price.replace(n, "")
+                        if " " in price:
+                            price = price.raplace(" ", "")
+
+                    # [model/size , design , color , price]
+                    new_list = ["","","" , f"{price}" , f'{data_stock}']
+
+                    for item in split_text:
+
+                        if "مدل:" in item:
+                            new_list[0] =item.replace("مدل: " ,"")
+                            if new_list[0][0] ==" ":
+                                new_list[0] = new_list[0][1:]
+                        elif "سایز:" in item:
+                            new_list[0] = item.replace("سایز: ", "")
+                            if new_list[0][0] == " ":
+                                new_list[0] = new_list[0][1:]
+
+
+
+
+                        if "طرح:" in item:
+                            new_list[2] =item.replace("طرح: " ,"")
+                            if new_list[2][0] ==" ":
+                                new_list[2] =new_list[2][1:]
+                        elif "رنگ:" in item:
+                            new_list[2] = item.replace("رنگ: ", "")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+                        elif "رنگ بر اساس گارد:" in item:
+                            new_list[2] = item.replace("رنگ بر اساس گارد: ", "")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+
+                        all_products.append(new_list)
+
+            for product in all_products:
+                temp =title
+                title = f"{title}مناسب برای سایز{product[0]}"
+                product_name =title
+                title =temp
+                if product_name in product_groups:
+                    if product[1] not in product_groups[product_name]["design"]:
+                        product_groups[product_name]["design"].append(product[1])
+                    if product[2] not in product_groups[product_name]["color"]:
+                        product_groups[product_name]["color"].append(product[2])
+                else:
+                    product_groups[product_name] = {
+                        "product_id": f"{product_id}",
+                        "title": product_name,
+                        "design": [product[1]],  # لیست خالی برای طرح ها
+                        "color": [product[2]],
+                        "price": product[3],
+                        "stock": "1" if product[4] != "0" else "0",
+
+                    }
+                    product_groups["category"] = "اپل واچ"
+                    product_groups["product_id"] =f"{product_id}"
+
+
+            return product_groups
+
+        elif "بند" in title:
+            elements = soup.find_all(attrs={'class': 'product-variant-input'})[0].find_all("option")
+            for i in elements:
+                data_stock = i.get("data-stock")
+                if data_stock != "0":
+                    text = i.text.replace("\t", "").replace("\n", "")
+                    split_text = text.split("،")
+                    price = i.get("data-price")
+                    for n in num:
+                        if n in price:
+                            price = price.replace(n, "")
+                        if " " in price:
+                            price = price.raplace(" ", "")
+
+                    # [model/size , design , color , price]
+                    new_list = ["","","" , f"{price}" , f'{data_stock}']
+
+                    for item in split_text:
+                        if "مدل: " in title:
+                            new_list[2] = item.replace("مدل: " ,"")
+                            if new_list[2][0] ==" ":
+                                new_list[2] = new_list[2][1:]
+                        elif "رنگ:" in item:
+                            new_list[2] = item.replace("رنگ: ", "")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+                        elif "طرح:" in item:
+                            new_list[2] = item.replace("طرح: ", "")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+
+
+                        all_products.append(new_list)
+
+            for product in all_products:
+                product_name = title
+                if product_name in product_groups:
+                    if product[1] not in product_groups[product_name]["design"]:
+                        product_groups[product_name]["design"].append(product[1])
+                    if product[2] not in product_groups[product_name]["color"]:
+                        product_groups[product_name]["color"].append(product[2])
+                else:
+                    product_groups[product_name] = {
+                        "product_id": f"{product_id}",
+                        "title": title,
+                        "design": [product[1]],  # لیست خالی برای طرح ها
+                        "color": [product[2]],
+                        "price": product[3],
+                        "stock": "1" if product[4] != "0" else "0",
+
+                    }
+                    product_groups["category"] = "بند"
+                    product_groups["product_id"] =f"{product_id}"
+
+
+            return product_groups
+
+        elif "استند" in title:
+            elements = soup.find_all(attrs={'class': 'product-variant-input'})[0].find_all("option")
+            for i in elements:
+                data_stock = i.get("data-stock")
+                if data_stock != "0":
+                    text = i.text.replace("\t", "").replace("\n", "")
+                    split_text = text.split("،")
+                    price = i.get("data-price")
+                    for n in num:
+                        if n in price:
+                            price = price.replace(n, "")
+                        if " " in price:
+                            price = price.raplace(" ", "")
+
+                    # [model/size , design , color , price]
+                    new_list = ["", "", "", f"{price}" , f'{data_stock}']
+
+                    for item in split_text:
+                        if "مدل: " in title:
+                            new_list[2] = item.replace("مدل: ", "")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+
+                            all_products.append(new_list)
+
+            for product in all_products:
+                product_name = title
+                if product_name in product_groups:
+                    if product[1] not in product_groups[product_name]["design"]:
+                        product_groups[product_name]["design"].append(product[1])
+                    if product[2] not in product_groups[product_name]["color"]:
+                        product_groups[product_name]["color"].append(product[2])
+                else:
+                    product_groups[product_name] = {
+                        "product_id": f"{product_id}",
+                        "title": title,
+                        "design": [product[1]],  # لیست خالی برای طرح ها
+                        "color": [product[2]],
+                        "price": product[3],
+                        "stock": "1" if product[4] != "0" else "0",
+
+                    }
+                    product_groups["category"] = "استند"
+                    product_groups["product_id"] =f"{product_id}"
+
+
+            return product_groups
+
+        elif "جاسیگاری" in title:
+            elements = soup.find_all(attrs={'class': 'product-variant-input'})[0].find_all("option")
+            for i in elements:
+                data_stock = i.get("data-stock")
+                if data_stock != "0":
+                    text = i.text.replace("\t", "").replace("\n", "")
+                    split_text = text.split("،")
+                    price = i.get("data-price")
+                    for n in num:
+                        if n in price:
+                            price = price.replace(n, "")
+                        if " " in price:
+                            price = price.raplace(" ", "")
+
+                    # [model/size , design , color , price]
+                    new_list = ["", "", "", f"{price}" , f'{data_stock}']
+
+                    for item in split_text:
+                        if "مدل: " in title:
+                            new_list[0] = item.replace("مدل: ", "")
+                            if new_list[0][0] == " ":
+                                new_list[0] = new_list[0][1:]
+
+                            all_products.append(new_list)
+
+            for product in all_products:
+                product_name = title
+                if product_name in product_groups:
+                    if product[1] not in product_groups[product_name]["design"]:
+                        product_groups[product_name]["design"].append(product[1])
+                    if product[2] not in product_groups[product_name]["color"]:
+                        product_groups[product_name]["color"].append(product[2])
+                else:
+                    product_groups[product_name] = {
+                        "product_id": f"{product_id}",
+                        "title": title,
+                        "design": [product[1]],  # لیست خالی برای طرح ها
+                        "color": [product[2]],
+                        "price": product[3],
+                        "stock": "1" if product[4] != "0" else "0",
+
+                    }
+                    product_groups["category"] = "جاسیگاری"
+                    product_groups["product_id"] =f"{product_id}"
+
+
+            return product_groups
+
+        elif "کیسه آب گرم" in title:
+            elements = soup.find_all(attrs={'class': 'product-variant-input'})[0].find_all("option")
+            for i in elements:
+                data_stock = i.get("data-stock")
+                if data_stock != "0":
+                    text = i.text.replace("\t", "").replace("\n", "")
+                    split_text = text.split("،")
+                    price = i.get("data-price")
+                    for n in num:
+                        if n in price:
+                            price = price.replace(n, "")
+                        if " " in price:
+                            price = price.raplace(" ", "")
+
+                    # [model/size , design , color , price]
+                    new_list = ["", "", "", f"{price}" , f'{data_stock}']
+
+                    for item in split_text:
+                        if "مدل: " in title:
+                            new_list[2] = item.replace("مدل: ", "")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+                        elif "رنگ: " in title:
+                            new_list[2] =item.replace("رنگ: " ,"")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+                        elif "طرح: " in title:
+                            new_list[2] = item.replace("طرح: ", "")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+
+
+                        all_products.append(new_list)
+
+            for product in all_products:
+                product_name = title
+                if product_name in product_groups:
+                    if product[1] not in product_groups[product_name]["design"]:
+                        product_groups[product_name]["design"].append(product[1])
+                    if product[2] not in product_groups[product_name]["color"]:
+                        product_groups[product_name]["color"].append(product[2])
+                else:
+                    product_groups[product_name] = {
+                        "product_id": f"{product_id}",
+                        "title": title,
+                        "design": [product[1]],  # لیست خالی برای طرح ها
+                        "color": [product[2]],
+                        "price": product[3],
+                        "stock": "1" if product[4] != "0" else "0",
+
+                    }
+                    product_groups["category"] = "کیسه آب گرم"
+                    product_groups["product_id"] =f"{product_id}"
+
+
+            return product_groups
+
+        else:
+            elements = soup.find_all(attrs={'class': 'product-variant-input'})[0].find_all("option")
+            for i in elements:
+                data_stock = i.get("data-stock")
+                if data_stock != "0":
+                    text = i.text.replace("\t", "").replace("\n", "")
+                    split_text = text.split("،")
+                    price = i.get("data-price")
+                    for n in num:
+                        if n in price:
+                            price = price.replace(n, "")
+                        if " " in price:
+                            price = price.raplace(" ", "")
+
+                    # [model/size , design , color , price]
+                    new_list = ["", "", "", f"{price}" , f'{data_stock}']
+
+                    for item in split_text:
+                        if "مدل: " in title:
+                            new_list[2] = item.replace("مدل: ", "")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+                        elif "رنگ: " in title:
+                            new_list[2] = item.replace("رنگ: ", "")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+                        elif "طرح: " in title:
+                            new_list[2] = item.replace("طرح: ", "")
+                            if new_list[2][0] == " ":
+                                new_list[2] = new_list[2][1:]
+
+                        all_products.append(new_list)
+
+            for product in all_products:
+                product_name = title
+                if product_name in product_groups:
+                    if product[1] not in product_groups[product_name]["design"]:
+                        product_groups[product_name]["design"].append(product[1])
+                    if product[2] not in product_groups[product_name]["color"]:
+                        product_groups[product_name]["color"].append(product[2])
+                else:
+                    product_groups[product_name] = {
+                        "product_id": f"{product_id}",
+                        "title": title,
+                        "design": [product[1]],  # لیست خالی برای طرح ها
+                        "color": [product[2]],
+                        "price": product[3],
+                        "stock": "1" if product[4] != "0" else "0",
+
+                    }
+                    product_groups["category"] = "متفرقه"
+                    product_groups["product_id"] =f"{product_id}"
 
 
             return product_groups
 
 
-        elif "کاور" in title:
-            # elements = soup.find_all(attrs={'class':'product-variant-input'})[0].find_all("option")
-            # print(product_id)
-            # for i in elements:
-            #     data_stock = i.get("data-stock")
-            #     if data_stock != "0":
-            #         print(i.text.replace("\t","").replace("\n",""))
-            # print("\n\n")
-            # sleep(5)
-        elif "محافظ کابل" in title:
-            pass
-        elif "جاکارتی" in title:
-            pass
+    def get_images(self ,product_id):
+        url = f'{self.BASE_URL}{product_id}'
+        response = self.get_response(url)
+        soup = self.get_soup(response)
+        images = soup.find_all(attrs={"class": "product-images-item"})
+        image = soup.find_all(attrs={'class':"product-image-element"})[0].get('src')
+        image = [image]
+        images = [item.get('src') for item in images]
+        images = images + image
+        temp = []
+        for item in images:
+            find = item.index("?")
+            item = item.replace(item[find:] ,"")
+            temp.append(item)
+        images =temp
+        images = [f'{self.BASE_URL}{item}' for item in images]
 
-
-
-
-
-
-
-
-
+        return images

@@ -1,3 +1,3 @@
 call .\venv\Scripts\activate.bat &
-python manage.py update --update_all
+python manage.py migrate
 pause

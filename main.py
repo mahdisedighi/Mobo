@@ -23,12 +23,13 @@ from db.models import *
 """ Replace the code below with your own """
 from utils.api_and_crawl import Mobo
 from db.models import Brand , Product_model
-
+from db.management.commands import add
 
 
 if __name__ == '__main__':
-    m = Mobo()
-    p = m.get_products()
-    for i in p:
-        m.get_info(i)
+    pass
+
+
+
+
 
