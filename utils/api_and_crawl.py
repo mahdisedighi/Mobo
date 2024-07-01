@@ -422,6 +422,7 @@ class Mobo():
             for product in all_products:
 
                 temp = title
+
                 for xxx in product_models:
                     name = xxx.model.lower()
                     try:
@@ -433,7 +434,7 @@ class Mobo():
                         brand_id = 4
                         break
                     elif (jj in name) or (name in jj):
-                        brand_id =xxx.brand_id
+                        brand_id =xxx.id
                         brand_name = Product_model.objects.get(id=brand_id)
                         brand_id = brand_name.id
                         break

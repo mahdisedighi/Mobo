@@ -27,7 +27,10 @@ from db.management.commands import add
 
 
 if __name__ == '__main__':
-    pass
+    b = Mobo()
+    m = b.get_products()
+    for i in m:
+        b.get_info(i)
 
 
 

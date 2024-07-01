@@ -30,7 +30,6 @@ class Command(BaseCommand):
 
         for product_object in tqdm(list(queryset) , desc="updating"):
             main_category = b.get_product(product_object.id)['main_category']
-            print(main_category)
             mobo_id = product_object.identifier.split("---")[0]
             identifier = product_object.identifier
             mobo_product = mo.get_info(mobo_id)
@@ -38,7 +37,6 @@ class Command(BaseCommand):
                 if item != "category" and item != "product_id":
                     if f"{mobo_id}---{item}" == identifier: # در موبو موجود است
                         biid_product, colors = mobo_to_biid(mobo_product[item],main_category)
-
                         product_hash = hash_product(biid_product)
                         if (product_object.product_hash == product_hash) and not options['product_ids']:
                             continue
@@ -88,4 +86,3 @@ class Command(BaseCommand):
 
             # print(mobo_product)
             # biid_product, colors = masterkala_to_biid(masterkala_product,main_category=main_category)
-
