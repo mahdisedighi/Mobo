@@ -349,7 +349,9 @@ class Mobo():
         product_groups = {}
         all_products = []
         num = [f"-{i}" for i in range(0,50)]
-        if "قاب" in title:
+        if "سبد" in title:
+            pass
+        elif "قاب" in title:
             elements = soup.find_all(attrs={'class':'product-variant-input'})[0].find_all("option")
             for i in elements:
                 data_stock = i.get("data-stock")
