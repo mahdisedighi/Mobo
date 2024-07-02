@@ -550,7 +550,7 @@ class Mobo():
                         "stock": "1" if product[4] != "0" else "0",
 
                     }
-                    product_groups["category"] = "کاور ایرپاد"
+                    product_groups["category"] = "لوازم جانبی ایرپاد"
                     product_groups["product_id"] =f"{product_id}"
 
 
@@ -612,7 +612,7 @@ class Mobo():
                         "price": product[3],
                         "stock" : "1" if product[4] != "0" else "0",
                     }
-                    product_groups["category"] = "محافظ کابل"
+                    product_groups["category"] = "اکسسوری و لوازم جانبی"
                     product_groups["product_id"] =f"{product_id}"
 
 
@@ -659,7 +659,7 @@ class Mobo():
                         "stock": "1" if product[0] != "0" else "0",
 
                     }
-                    product_groups["category"] = "جاکارتی"
+                    product_groups["category"] = "اکسسوری و لوازم جانبی"
                     product_groups["product_id"] =f"{product_id}"
 
 
@@ -731,7 +731,7 @@ class Mobo():
                         "stock": "1" if product[4] != "0" else "0",
 
                     }
-                    product_groups["category"] = "اپل واچ"
+                    product_groups["category"] = "لوازم جانبی اپل واچ"
                     product_groups["product_id"] =f"{product_id}"
 
 
@@ -788,7 +788,7 @@ class Mobo():
                         "stock": "1" if product[4] != "0" else "0",
 
                     }
-                    product_groups["category"] = "بند"
+                    product_groups["category"] = "اکسسوری و لوازم جانبی"
                     product_groups["product_id"] =f"{product_id}"
 
 
@@ -836,7 +836,7 @@ class Mobo():
                         "stock": "1" if product[4] != "0" else "0",
 
                     }
-                    product_groups["category"] = "استند"
+                    product_groups["category"] = "اکسسوری و لوازم جانبی"
                     product_groups["product_id"] =f"{product_id}"
 
 
@@ -884,7 +884,7 @@ class Mobo():
                         "stock": "1" if product[4] != "0" else "0",
 
                     }
-                    product_groups["category"] = "جاسیگاری"
+                    product_groups["category"] = "اکسسوری و لوازم جانبی"
                     product_groups["product_id"] =f"{product_id}"
 
 
@@ -941,7 +941,7 @@ class Mobo():
                         "stock": "1" if product[4] != "0" else "0",
 
                     }
-                    product_groups["category"] = "کیسه آب گرم"
+                    product_groups["category"] = "اکسسوری و لوازم جانبی"
                     product_groups["product_id"] =f"{product_id}"
 
 
@@ -997,7 +997,7 @@ class Mobo():
                         "stock": "1" if product[4] != "0" else "0",
 
                     }
-                    product_groups["category"] = "متفرقه"
+                    product_groups["category"] = "اکسسوری و لوازم جانبی"
                     product_groups["product_id"] =f"{product_id}"
 
 
