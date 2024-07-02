@@ -6,8 +6,7 @@ import math
 def mobo_to_biid(mobo_product ,main_category=435):
     discount = 10
     mobo_price = int(mobo_product['price'])
-    biid_price = math.ceil(mobo_price * 100 / (100 - discount) / 10000) * 10000
-    biid_price += 50_000
+    biid_price = mobo_price + 140_000
 
     biid_product_info = {
         "name": mobo_product["title"],

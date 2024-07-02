@@ -168,25 +168,27 @@ class Biid(BaseRequests):
         response = requests.post(url, headers=self.headers, json=tag, cookies=self.session.cookies)
         return response
 
-    def add_product(self, product, category):
+    def add_product(self, product):
         url = f"{self.BASE_URL}/products/"
         cat_id = 0
         res = False
         parent = 435
+        if "قاب" in product['main_category']:
+            parent = 436
+
         for cat in self.get_categories()['result']:
-            if cat['name'] == category and cat["parent"] ==parent:
+            if cat['name'] == product['main_category'] and cat["parent"] ==parent:
                 parent = int(cat['id'])
                 res = True
         if res == False:
             cat_j = {
-                "name": f"{category}",
+                "name": f"{product['main_category']}",
                 'parent': parent,
             }
             x = self.add_category(cat_j)
             parent = int(x.json()['id'])
 
         product['main_category'] = parent
-
 
 
         response = requests.post(
@@ -385,6 +387,10 @@ class Mobo():
                         title =title.replace("آیفون" ,"")
                     elif "آیفون" in title:
                         title =title.replace("آیفون" ,"")
+                    elif "سامسونگ" in title:
+                        title =title.replace("سامسونگ" ,"")
+                    elif "شیائومی" in title:
+                        title =title.replace("شیائومی" ,"")
 
 
 
@@ -439,10 +445,10 @@ class Mobo():
                         brand_id = brand_name.id
                         break
 
-                if str(brand_id) == "1":
+                if str(brand_id) == "1" or ("samsung" in product[0].lower()) :
                     brand_name = "سامسونگ "
                     status_title = "yes"
-                elif str(brand_id) == "2" or str(brand_id) == "3":
+                elif str(brand_id) == "2" or str(brand_id) == "3" or ("redmi" in product[0].lower()) or ("xiaomi" in product[0].lower()) or ("poco" in product[0].lower()):
                     brand_name = "شیائومی "
                     status_title = "yes"
                 elif str(brand_id) == "4":
@@ -469,9 +475,10 @@ class Mobo():
                         "price": product[3],
                         "stock": 1 if product[4] != "0" else 0,
                         "status_title" : status_title,
+                        "category_var" : f"قاب {brand_name}"
 
                     }
-                    product_groups["category"] ="قاب"
+                    product_groups["category"] ="قاب موبایل"
                     product_groups["product_id"] =f"{product_id}"
 
 

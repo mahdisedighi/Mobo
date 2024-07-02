@@ -21,16 +21,16 @@ from db.models import *
 ## START OF APPLICATION
 ############################################################################
 """ Replace the code below with your own """
-from utils.api_and_crawl import Mobo
+from utils.api_and_crawl import Mobo , Biid
 from db.models import Brand , Product_model
 from db.management.commands import add
 
 
 if __name__ == '__main__':
-    b = Mobo()
-    m = b.get_products()
-    for i in m:
-        b.get_info(i)
+    b = Biid()
+    # print(b.get_product_variants(7286))
+    print()
+    print(b.get_product_variants(12782))
 
 
 
