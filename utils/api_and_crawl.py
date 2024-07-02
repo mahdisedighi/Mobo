@@ -455,8 +455,8 @@ class Mobo():
                     brand_name = "آیفون "
                     status_title = "yes"
                 else:
-                    brand_name =""
-                    status_title = "no"
+                    brand_name ="سامسونگ"
+                    status_title = "yes"
 
                 title = f"{title} مناسب برای {brand_name +product[0]}"
                 product_name = title
