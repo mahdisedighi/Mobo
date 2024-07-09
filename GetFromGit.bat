@@ -1,2 +1,2 @@
-git pull https://github.com/mahdisedighi/Mobo.git
+git pull mobo
 pause
