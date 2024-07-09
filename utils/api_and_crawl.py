@@ -289,6 +289,7 @@ class Mobo():
 
     BASE_URL = 'https://mobomobo.ir/'
     def get_response(self, url):
+        sleep(6)
         response = requests.get(url)
         return response
 
@@ -326,7 +327,6 @@ class Mobo():
                             continue
                         else:
                             counter +=1
-                            sleep(5)
                             yield link
                     page += 1
 
