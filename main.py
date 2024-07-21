@@ -28,9 +28,8 @@ from db.management.commands import add
 
 if __name__ == '__main__':
     b = Biid()
-    # print(b.get_product_variants(7286))
     print()
-    print(b.get_product_variants(12782))
+    print(b.get_product(13237))
 
 
 

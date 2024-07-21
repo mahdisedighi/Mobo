@@ -77,13 +77,13 @@ class Command(BaseCommand):
                             b.add_colors_to_product(product_object.id, colors)
 
 
-                        if len(colors) != 0:
-                            variants = b.get_product_variants(product_object.id)
-                            for variant in variants:
-                                b.update_product_variant(product_object.id, variant['id'],
-                                                         {'product_identifier': biid_product['barcode'],
-                                                          "price": biid_product['price'],
-                                                          'compare_at_price': biid_product['compare_at_price']})
+                        variants = b.get_product_variants(product_object.id)
+                        print(variants)
+                        for variant in variants:
+                            b.update_product_variant(product_object.id, variant['id'],
+                                                     {'product_identifier': biid_product['barcode'],
+                                                      "price": biid_product['price'],
+                                                      'compare_at_price': biid_product['compare_at_price']})
 
 
 
