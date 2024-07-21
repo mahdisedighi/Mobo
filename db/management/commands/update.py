@@ -6,6 +6,7 @@ from tqdm import tqdm
 from utils.api_and_crawl import Mobo ,Biid
 from db.models import Product
 from utils.convert import mobo_to_biid, hash_product
+from time import sleep
 
 
 class Command(BaseCommand):
@@ -93,8 +94,5 @@ class Command(BaseCommand):
                         product_object.commit = True
                         product_object.save()
                         print(f"update succesfuly {product_object.id}")
-
-                    else:
-                        print("Error")
 
 
