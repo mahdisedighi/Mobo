@@ -77,24 +77,12 @@ class Command(BaseCommand):
                             b.add_colors_to_product(product_object.id, colors)
 
 
-<<<<<<< HEAD
-                        
                         variants = b.get_product_variants(product_object.id)
-                        for variant in variants:
-                            b.update_product_variant(product_object.id, variant['id'],
-                                                         {'product_identifier': biid_product['barcode'],
-                                                          "price": biid_product['price'],
-                                                          'compare_at_price': biid_product['compare_at_price']})
-=======
-                        variants = b.get_product_variants(product_object.id)
-                        print(variants)
-                        sleep(20000)
                         for variant in variants:
                             b.update_product_variant(product_object.id, variant['id'],
                                                      {'product_identifier': biid_product['barcode'],
                                                       "price": biid_product['price'],
                                                       'compare_at_price': biid_product['compare_at_price']})
->>>>>>> 08f9e99e22c4159a559803a18587f4b5e42b0d99
 
 
 
@@ -105,9 +93,5 @@ class Command(BaseCommand):
                         product_object.commit = True
                         product_object.save()
                         print(f"update succesfuly {product_object.id}")
-<<<<<<< HEAD
-               
-=======
->>>>>>> 08f9e99e22c4159a559803a18587f4b5e42b0d99
 
 
