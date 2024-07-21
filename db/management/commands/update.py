@@ -38,8 +38,8 @@ class Command(BaseCommand):
                     if f"{mobo_id}---{item}" == identifier: # در موبو موجود است
                         biid_product, colors = mobo_to_biid(mobo_product[item],main_category)
                         product_hash = hash_product(biid_product)
-                        # if (product_object.product_hash == product_hash) and not options['product_ids']:
-                        #     continue
+                        if (product_object.product_hash == product_hash) and not options['product_ids']:
+                            continue
 
                         product_object.commit = False
                         product_object.save()
