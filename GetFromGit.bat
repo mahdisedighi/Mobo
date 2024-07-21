@@ -1,2 +1,2 @@
-git pull mobo master
+git pull mobo
 pause
