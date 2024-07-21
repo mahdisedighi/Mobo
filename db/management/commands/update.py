@@ -79,6 +79,7 @@ class Command(BaseCommand):
 
                         variants = b.get_product_variants(product_object.id)
                         print(variants)
+                        sleep(20000)
                         for variant in variants:
                             b.update_product_variant(product_object.id, variant['id'],
                                                      {'product_identifier': biid_product['barcode'],
