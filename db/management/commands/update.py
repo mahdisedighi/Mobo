@@ -37,9 +37,9 @@ class Command(BaseCommand):
                 if item != "category" and item != "product_id":
                     if f"{mobo_id}---{item}" == identifier: # در موبو موجود است
                         biid_product, colors = mobo_to_biid(mobo_product[item],main_category)
-                        product_hash = hash_product(biid_product)
-                        if (product_object.product_hash == product_hash) and not options['product_ids']:
-                            continue
+                        # product_hash = hash_product(biid_product)
+                        # if (product_object.product_hash == product_hash) and not options['product_ids']:
+                        #     continue
 
                         product_object.commit = False
                         product_object.save()
@@ -93,5 +93,8 @@ class Command(BaseCommand):
                         product_object.commit = True
                         product_object.save()
                         print(f"update succesfuly {product_object.id}")
+
+                    else:
+                        print("Error")
 
 
