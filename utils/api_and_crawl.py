@@ -422,10 +422,17 @@ class Mobo():
                     if "رنگ:" in item:
                         new_list[2] = item.replace("رنگ: ", "")
 
-                all_products.append(new_list)
+                temp = new_list[0].split("/")
+                for item in temp:
+                    new_list[0] = item
+                    all_products.append(new_list)
 
-            iphone_models = ["7" ,"7plus" ,"7+" ,"8" ,"8plus" ,"8+" , "x" ,"xs","11" , "11pro" ,'11promax' ,"12" ,"12pro" ,"12promax" ,"13" ,"13pro" ,"13promax" ,
-                             "14" ,"14pro" ,"14promax" ,"15" ,"15pro" ,"15promax" ,"16" ,"16pro" ,"16promax" ,"17" ,"17pro" ,"17promax"]
+            iphone_models = ["7", "7plus", "7+", "8", "8plus", "8+", "x", "xs", "11", "11pro", '11promax', "12",
+                             "12pro", "12promax", "13", "13pro", "13promax",
+                             "14", "14plus", "14+", "14pro", "14promax", "15","15plus" ,"15+" , "15pro", "15promax", "16", "16pro",
+                             "16promax", "17",
+                             "17pro", "17promax"]
+
             for product in all_products:
 
                 temp = title
@@ -441,15 +448,22 @@ class Mobo():
                         brand_id = 4
                         break
 
-                    # elif jj in iphone_models:
-                    #     brand_id = 4
-                    #     break
-
                     elif (jj in name) or (name in jj):
                         brand_id =xxx.id
                         brand_name = Product_model.objects.get(id=brand_id)
                         brand_id = brand_name.id
                         break
+                try:
+                    jj = product[0].replace(" ", "")
+                except:
+                    pass
+
+                for ppp in iphone_models:
+                    if (jj in ppp) or (ppp in jj):
+                        brand_id = 4
+                        break
+
+
 
                 if str(brand_id) == "1" or ("samsung" in product[0].lower()) :
                     brand_name = "سامسونگ "
@@ -1040,6 +1054,164 @@ class Mobo():
 
 
             return product_groups
+
+        elif "گلس" in title:
+            elements = soup.find_all(attrs={'class': 'product-variant-input'})[0].find_all("option")
+            for i in elements:
+                data_stock = i.get("data-stock")
+
+                text = i.text.replace("\t", "").replace("\n", "")
+                split_text = text.split("،")
+                for item in split_text:
+                    if "\u200f" in item:
+                        index = split_text.index(item)
+                        split_text[index] = item.replace("\u200f", "")
+
+                for it in split_text:
+                    for n in num:
+                        n = n[::-1]
+                        if n in it:
+                            index = split_text.index(it)
+                            split_text[index] = it.replace(n, "")
+
+                price = i.get("data-price")
+                for n in num:
+                    if n in price:
+                        price = price.replace(n, "")
+                    if " " in price:
+                        price = price.raplace(" ", "")
+                    if "آیفون سامسونگ شیائومی" in title:
+                        title = title.replace("آیفون سامسونگ شیائومی", "")
+                    elif "آیفون / سامسونگ / شیائومی" in title:
+                        title = title.replace("آیفون / سامسونگ / شیائومی", "")
+                    elif "آیفون ، سامسونگ ، شیائومی" in title:
+                        title = title.replace("آیفون ، سامسونگ ، شیائومی", "")
+                    elif "سامسونگ و شیائومی" in title:
+                        title = title.replace("سامسونگ و شیائومی", "")
+                    elif "آیفونی" in title:
+                        title = title.replace("آیفون", "")
+                    elif "آیفون" in title:
+                        title = title.replace("آیفون", "")
+                    elif "سامسونگ" in title:
+                        title = title.replace("سامسونگ", "")
+                    elif "شیائومی" in title:
+                        title = title.replace("شیائومی", "")
+
+                    # [model , design , color , price]
+                    new_list = ["", "", "", f"{price}", f'{data_stock}']
+                    for item in split_text:
+                        if "مدل:" in item:
+                            new_list[0] = item.replace("مدل: ", "")
+                            if new_list[0][0] == " ":
+                                new_list[0] = new_list[0][1:]
+                        elif "Phone Model:" in item:
+                            new_list[0] = item.replace("Phone Model: ", "")
+                        elif "مدل موبایل:" in item:
+                            new_list[0] = item.replace("مدل موبایل: ", "")
+                        elif "مدل گوشی:" in item:
+                            new_list[0] = item.replace("مدل گوشی: ", "")
+                        elif "Apple:" in item:
+                            new_list[0] = item.replace("Apple: ")
+                        elif "iPhone:" in item:
+                            new_list[0] = item.replace("iPhone: ", "")
+
+                        if "طرح:" in item:
+                            new_list[1] = item.replace("طرح: ", "")
+                        elif "شاسی:" in item:
+                            new_list[1] = item.replace("شاسی: ", "")
+
+                        if "رنگ:" in item:
+                            new_list[2] = item.replace("رنگ: ", "")
+
+                    temp = new_list[0].split("/")
+                    for item in temp:
+                        new_list[0] = item
+                        all_products.append(new_list)
+
+                iphone_models = ["7", "7plus", "7+", "8", "8plus", "8+", "x", "xs", "11", "11pro", '11promax', "12",
+                                 "12pro", "12promax", "13", "13pro", "13promax",
+                                 "14","14plus" ,"14+", "14pro", "14promax", "15", "15pro", "15promax", "16", "16pro", "16promax", "17",
+                                 "17pro", "17promax"]
+                for product in all_products:
+
+                    temp = title
+
+                    for xxx in product_models:
+                        name = xxx.model.lower()
+                        try:
+                            jj = product[0].replace(" ", "")
+                        except:
+                            pass
+                        jj = jj.lower()
+                        if "iphone" in jj:
+                            brand_id = 4
+                            break
+
+                        elif (jj in name) or (name in jj):
+                            brand_id = xxx.id
+                            brand_name = Product_model.objects.get(id=brand_id)
+                            brand_id = brand_name.id
+                            break
+
+                    try:
+                        jj = product[0].replace(" ", "")
+                    except:
+                        pass
+
+                    for ppp in iphone_models:
+                        if (jj in ppp) or (ppp in jj):
+                            brand_id = 4
+                            break
+
+                    if str(brand_id) == "1" or ("samsung" in product[0].lower()):
+                        brand_name = "سامسونگ "
+                        status_title = "yes"
+                    elif str(brand_id) == "2" or str(brand_id) == "3" or ("redmi" in product[0].lower()) or (
+                            "xiaomi" in product[0].lower()) or ("poco" in product[0].lower()):
+                        brand_name = "شیائومی "
+                        status_title = "yes"
+                    elif str(brand_id) == "4":
+                        brand_name = "آیفون "
+                        status_title = "yes"
+                    else:
+                        brand_name = ""
+                        status_title = "yes"
+
+                    title = f"{title} مناسب برای {brand_name + product[0]}"
+                    product_name = title
+                    title = temp
+                    if product_name in product_groups:
+                        if product[4] != "0":
+                            if product_groups[product_name]["stock"] == "1":
+                                if product[1] not in product_groups[product_name]["design"]:
+                                    product_groups[product_name]["design"].append(product[1])
+                                if product[2] not in product_groups[product_name]["color"]:
+                                    product_groups[product_name]["color"].append(product[2])
+
+                            else:
+                                product_groups[product_name]["design"].clear()
+                                product_groups[product_name]["color"].clear()
+                                if product[1] not in product_groups[product_name]["design"]:
+                                    product_groups[product_name]["design"].append(product[1])
+                                if product[2] not in product_groups[product_name]["color"]:
+                                    product_groups[product_name]["color"].append(product[2])
+
+                    else:
+                        product_groups[product_name] = {
+                            "product_id": f"{product_id}",
+                            "title": f"{product_name}",
+                            "design": [product[1]],  # لیست خالی برای طرح ها
+                            "color": [product[2]],
+                            "price": product[3],
+                            "stock": 1 if product[4] != "0" else 0,
+                            "status_title": status_title,
+                            "category_var": f"گلس {brand_name}"
+
+                        }
+                        product_groups["category"] = "گلس موبایل"
+                        product_groups["product_id"] = f"{product_id}"
+
+                return product_groups
 
         else:
             elements = soup.find_all(attrs={'class': 'product-variant-input'})[0].find_all("option")
