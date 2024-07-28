@@ -182,7 +182,7 @@ class Biid(BaseRequests):
 
         if res == False:
             cat_j = {
-                "name": f"{product['main_category']}",
+                "name": f"{product['main_category'][0]}",
                 'parent': parent,
             }
             x = self.add_category(cat_j)
