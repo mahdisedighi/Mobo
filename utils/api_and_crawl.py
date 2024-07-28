@@ -174,6 +174,7 @@ class Biid(BaseRequests):
         parent = 435
 
         for x in product["main_category"]:
+            print(x)
             for cat in self.get_categories()['result']:
                 if cat['name'] == x and cat["parent"] == parent:
                     print(x)
@@ -189,7 +190,7 @@ class Biid(BaseRequests):
                 parent = int(pp.json()['id'])
             res= False
 
-        product['main_category'] = parent
+        product['main_category'] = B
 
         response = requests.post(
             url,
