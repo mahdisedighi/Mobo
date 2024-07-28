@@ -170,16 +170,16 @@ class Biid(BaseRequests):
 
     def add_product(self, product):
         url = f"{self.BASE_URL}/products/"
-        cat_id = 0
         res = False
         parent = 435
-        if "قاب" in product['main_category']:
-            parent = 436
 
-        for cat in self.get_categories()['result']:
-            if cat['name'] == product['main_category'] and cat["parent"] ==parent:
-                parent = int(cat['id'])
-                res = True
+        for x in product["main_category"]:
+            for cat in self.get_categories()['result']:
+                if cat['name'] == x and cat["parent"] == parent:
+                    parent = int(cat['id'])
+                    res = True
+
+
         if res == False:
             cat_j = {
                 "name": f"{product['main_category']}",
@@ -461,6 +461,7 @@ class Mobo():
                 for ppp in iphone_models:
                     if (jj in ppp) or (ppp in jj):
                         brand_id = 4
+
                         break
 
 
@@ -474,6 +475,12 @@ class Mobo():
                 elif str(brand_id) == "4":
                     brand_name = "آیفون "
                     status_title = "yes"
+                    if "iphone" not in product[0].lower():
+                        product[0] = "iphone " + product[0]
+                    else:
+                        qqq = product[0].lower().replace("iphone" ,"")
+                        product[0] = "iphone " + qqq
+
                 else:
                     brand_name ="سامسونگ "
                     status_title = "yes"
@@ -506,7 +513,8 @@ class Mobo():
                         "price": product[3],
                         "stock": 1 if product[4] != "0" else 0,
                         "status_title" : status_title,
-                        "category_var" : f"قاب {brand_name}"
+                        "category_var" : f"قاب {brand_name}",
+                        "category_name" : product[0].lower()
 
                     }
                     product_groups["category"] ="قاب موبایل"

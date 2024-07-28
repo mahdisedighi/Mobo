@@ -36,12 +36,12 @@ class Command(BaseCommand):
                             print(f"product id={product_id} already exists")
                             continue
 
-                        category = mobo_product_info["category"]
+                        category = [mobo_product_info["category"]]
                         mobo_product = mobo_product_info[item]
 
                         if category == "قاب موبایل":
                             if mobo_product["status_title"] != "no":
-                                category = mobo_product["category_var"]
+                                category = [mobo_product["category_var"] ,mobo_product["category_name"]]
 
                         biid_product, colors = mobo_to_biid(mobo_product, category)
 
