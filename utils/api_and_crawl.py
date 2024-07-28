@@ -478,10 +478,18 @@ class Mobo():
                     brand_name = "آیفون "
                     status_title = "yes"
                     if "iphone" not in product[0].lower():
-                        product[0] = "iphone" + product[0]
+                        if " " in product[0].lower():
+                            product[0] = "iphone" + product[0].replace(" ","")
+                        else:
+                            product[0] = "iphone" + product[0]
+
                     else:
-                        qqq = product[0].lower().replace("iphone" ,"")
-                        product[0] = "iphone" + qqq
+                        if " " in product[0].lower():
+                            qqq = product[0].lower().replace("iphone" ,"")
+                            product[0] = "iphone" + qqq
+                        else:
+                            qqq = product[0].lower().replace("iphone", "")
+                            product[0] = "iphone" + qqq
 
                 else:
                     brand_name ="سامسونگ "
