@@ -498,6 +498,7 @@ class Mobo():
                 title = f"{title} مناسب برای {brand_name +product[0]}"
                 product_name = title
                 title =temp
+                print(product[0])
                 if product_name in product_groups:
                     if product[4] != "0":
                         if product_groups[product_name]["stock"] == "1":
