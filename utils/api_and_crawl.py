@@ -525,7 +525,7 @@ class Mobo():
                         "stock": 1 if product[4] != "0" else 0,
                         "status_title" : status_title,
                         "category_var" : f"قاب {brand_name}",
-                        "category_name" : product[0].lower()
+                        "category_name" : product[0].lower().replace(" ","")
 
                     }
                     product_groups["category"] ="قاب موبایل"
