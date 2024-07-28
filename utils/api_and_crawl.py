@@ -189,6 +189,7 @@ class Biid(BaseRequests):
             parent = int(x.json()['id'])
 
         product['main_category'] = parent
+        print("hi")
         sleep(30)
 
 
