@@ -40,7 +40,7 @@ class Command(BaseCommand):
                         mobo_product = mobo_product_info[item]
 
                         if category == "قاب موبایل":
-                            if mobo_product["status_title"] != "yes":
+                            if mobo_product["status_title"] == "yes":
                                 category = [mobo_product["category_var"] ,mobo_product["category_name"]]
                                 print(category)
 
