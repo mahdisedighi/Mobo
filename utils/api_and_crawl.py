@@ -189,6 +189,7 @@ class Biid(BaseRequests):
             parent = int(x.json()['id'])
 
         product['main_category'] = parent
+        sleep(30)
 
 
         response = requests.post(
