@@ -42,7 +42,6 @@ class Command(BaseCommand):
                         if category[0] == "قاب موبایل":
                             if mobo_product["status_title"] == "yes":
                                 category = [mobo_product["category_var"] ,mobo_product["category_name"]]
-                                print(category)
 
                         biid_product, colors = mobo_to_biid(mobo_product, category)
 

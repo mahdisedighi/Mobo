@@ -176,22 +176,20 @@ class Biid(BaseRequests):
         for x in product["main_category"]:
             for cat in self.get_categories()['result']:
                 if cat['name'] == x and cat["parent"] == parent:
+                    print(x)
                     parent = int(cat['id'])
                     res = True
 
-
-        if res == False:
-            cat_j = {
-                "name": f"{product['main_category'][0]}",
-                'parent': parent,
-            }
-            x = self.add_category(cat_j)
-            parent = int(x.json()['id'])
+            if res == False:
+                cat_j = {
+                    "name": f"{product['main_category'][0]}",
+                    'parent': parent,
+                }
+                pp = self.add_category(cat_j)
+                parent = int(pp.json()['id'])
+            res= False
 
         product['main_category'] = parent
-        print("hi")
-        sleep(30)
-
 
         response = requests.post(
             url,
@@ -498,7 +496,6 @@ class Mobo():
                 title = f"{title} مناسب برای {brand_name +product[0]}"
                 product_name = title
                 title =temp
-                print(product[0])
                 if product_name in product_groups:
                     if product[4] != "0":
                         if product_groups[product_name]["stock"] == "1":
@@ -525,7 +522,7 @@ class Mobo():
                         "stock": 1 if product[4] != "0" else 0,
                         "status_title" : status_title,
                         "category_var" : f"قاب {brand_name}",
-                        "category_name" : product[0].lower().replace(" ","")
+                        "category_name" : product[0].lower()
 
                     }
                     product_groups["category"] ="قاب موبایل"
