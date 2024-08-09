@@ -22,9 +22,9 @@ class Command(BaseCommand):
     def handle(self ,*args ,**options):
         mo =Mobo()
         b =Biid()
-
+        print("test")
         for mobo_product_short in mo.get_products():
-
+            print("hi")
             mobo_product_info = mo.get_info(mobo_product_short)
             for item in mobo_product_info:
                 if item != "category" and item != "product_id":
