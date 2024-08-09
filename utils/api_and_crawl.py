@@ -291,7 +291,6 @@ class Mobo():
 
     BASE_URL = 'https://mobomobo.ir/'
     def get_response(self, url):
-        sleep(6)
         response = requests.get(url)
         return response
 
@@ -347,6 +346,7 @@ class Mobo():
         response = self.get_response(url)
         soup = self.get_soup(response)
         title = self.get_title(product_id)
+        print(title)
         product_models = Product_model.objects.all()
         product_groups = {}
         all_products = []
