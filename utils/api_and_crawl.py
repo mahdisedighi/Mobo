@@ -171,13 +171,13 @@ class Biid(BaseRequests):
     def add_product(self, product):
         url = f"{self.BASE_URL}/products/"
         res = False
-        parent = 435
-
+        parent = 477
+        for ii in product["main_category"]:
+            print(ii)
         for x in product["main_category"]:
-            # print(x)
             for cat in self.get_categories()['result']:
-                if cat['name'] == x and cat["parent"] == parent:
-                    # print(x)
+                if cat['name'] == x:
+                    print(x)
                     parent = int(cat['id'])
                     res = True
 
@@ -187,6 +187,8 @@ class Biid(BaseRequests):
                     'parent': parent,
                 }
                 pp = self.add_category(cat_j)
+                print(pp.json())
+                sleep(50)
                 parent = int(pp.json()['id'])
             res= False
 
@@ -346,7 +348,6 @@ class Mobo():
         response = self.get_response(url)
         soup = self.get_soup(response)
         title = self.get_title(product_id)
-        print(title)
         product_models = Product_model.objects.all()
         product_groups = {}
         all_products = []
@@ -469,13 +470,13 @@ class Mobo():
 
 
                 if str(brand_id) == "1" or ("samsung" in product[0].lower()) :
-                    brand_name = "سامسونگ "
+                    brand_name = "سامسونگ | Samsung "
                     status_title = "yes"
                 elif str(brand_id) == "2" or str(brand_id) == "3" or ("redmi" in product[0].lower()) or ("xiaomi" in product[0].lower()) or ("poco" in product[0].lower()):
-                    brand_name = "شیائومی "
+                    brand_name = " شیائومی | Redmi | Xiaomi "
                     status_title = "yes"
                 elif str(brand_id) == "4":
-                    brand_name = "آیفون "
+                    brand_name = "آیفون | iPhone "
                     status_title = "yes"
                     if "iphone" not in product[0].lower():
                         if " " in product[0].lower():
@@ -527,7 +528,7 @@ class Mobo():
                         "category_name" : product[0].lower()
 
                     }
-                    product_groups["category"] ="قاب موبایل"
+                    product_groups["category"] ="قاب و کاور گوشی"
                     product_groups["product_id"] =f"{product_id}"
 
 
