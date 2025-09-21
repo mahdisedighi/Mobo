@@ -1,8 +1,8 @@
-pip install Django
-pip install lxml
-pip install requests
-pip install tqdm
-pip install urllib3
-pip install selenium
-pip install claude-api-py
-pip install pandas
+Django
+lxml
+requests
+tqdm
+urllib3
+selenium
+claude-api-py
+pandas
